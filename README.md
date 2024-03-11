@@ -1,0 +1,1 @@
+# bugsnag-flutter-dart-io-http-client
