@@ -1,39 +1,40 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# NOTE: This repo is a work in progress and has not yet been released as a production ready package.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+# BugSnag Flutter Dart:io Http Client
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A wrapper for [Dart:io HTTP](https://api.dart.dev/stable/3.3.1/dart-io/dart-io-library.html) that enables automated instrumentation via the BugSnag Performance SDK and Error Monitoring SDK. This package simplifies the process of tracking and monitoring HTTP requests in your Dart applications.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- **Automated Request Instrumentation**: Automatically creates network spans for HTTP requests and sends them to the BugSnag Performance dashboard.
 
-## Getting started
+## Getting Started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use the `BugsnagHttpClient` wrapper in your Dart project, first add the dependency to your `pubspec.yaml` file:
 
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+```yaml
+dependencies:
+  bugsnag_flutter_dart_io_http_client: ^1.0.0 # Use the latest version
 ```
 
-## Additional information
+Then, run pub get in your terminal to fetch the package.
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+## Usage
+Here's a simple example of using BugSnagHttpClient:
+
+```dart
+
+// Import the wrapper
+import 'package:bugsnag_flutter_dart_io_http_client/bugsnag_flutter_dart_io_http_client.dart' as dart_io;
+
+
+// add Bugsnag Performance as a subscriber. This only needs to be done once in your apps lifecycle.
+dart_io.addSubscriber(BugsnagPerformance.networkInstrumentation);
+
+
+// Make a request 
+final client = dart_io.BugsnagHttpClient();
+HttpClientRequest request = await client.getUrl(FixtureConfig.MAZE_HOST);
+await request.close();
+
+```
