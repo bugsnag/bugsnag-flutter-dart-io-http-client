@@ -207,7 +207,7 @@ class BugsnagHttpClient implements HttpClient{
 
   @override
   Future<HttpClientRequest> open(String method, String host, int port, String path) {
-    var requestId = _sendRequestStartNotification("$host:$port$path", "OPEN");
+    var requestId = _sendRequestStartNotification("$host:$port$path", method);
     return _getClient().open(method,host,port,path)
         .then((HttpClientRequest request) {
       request.done.then((HttpClientResponse response) {
@@ -221,7 +221,7 @@ class BugsnagHttpClient implements HttpClient{
 
   @override
   Future<HttpClientRequest> openUrl(String method, Uri url) {
-    var requestId = _sendRequestStartNotification(url.toString(), "OPEN");
+    var requestId = _sendRequestStartNotification(url.toString(), method);
     return _getClient().openUrl(method,url)
         .then((HttpClientRequest request) {
       request.done.then((HttpClientResponse response) {
