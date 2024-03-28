@@ -49,8 +49,8 @@ await request.close();
 ## Support
 
 * [Read the integration guide](https://docs.bugsnag.com/performance/flutter/)
-* [Search open and closed issues](https://github.com/bugsnag/bugsnag-flutter-performance/issues?utf8=✓&q=is%3Aissue) for similar problems
-* [Report a bug or request a feature](https://github.com/bugsnag/bugsnag-flutter-performance/issues/new)
+* [Search open and closed issues](https://github.com/bugsnag/bugsnag-flutter-dart-io-http-client/issues?utf8=✓&q=is%3Aissue) for similar problems
+* [Report a bug or request a feature](https://github.com/bugsnag/bugsnag-flutter-dart-io-http-client/issues/new)
 
 ## License
 
