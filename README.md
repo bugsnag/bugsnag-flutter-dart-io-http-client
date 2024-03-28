@@ -1,6 +1,13 @@
-# NOTE: This repo is a work in progress and has not yet been released as a production ready package.
+<div align="center">
+  <a href="https://www.bugsnag.com/platforms/flutter">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://assets.smartbear.com/m/3dab7e6cf880aa2b/original/BugSnag-Repository-Header-Dark.svg">
+      <img alt="SmartBear BugSnag logo" src="https://assets.smartbear.com/m/3945e02cdc983893/original/BugSnag-Repository-Header-Light.svg">
+    </picture>
+  </a>
+</div>
 
-# BugSnag Flutter Dart:io Http Client
+# BugSnag Flutter Dart:io Http Client Wrapper
 
 A wrapper for [Dart:io HTTP](https://api.dart.dev/stable/3.3.1/dart-io/dart-io-library.html) that enables automated instrumentation via the BugSnag Performance SDK and Error Monitoring SDK. This package simplifies the process of tracking and monitoring HTTP requests in your Dart applications.
 
@@ -38,3 +45,13 @@ HttpClientRequest request = await client.getUrl(FixtureConfig.MAZE_HOST);
 await request.close();
 
 ```
+
+## Support
+
+* [Read the integration guide](https://docs.bugsnag.com/performance/flutter/)
+* [Search open and closed issues](https://github.com/bugsnag/bugsnag-flutter-performance/issues?utf8=✓&q=is%3Aissue) for similar problems
+* [Report a bug or request a feature](https://github.com/bugsnag/bugsnag-flutter-performance/issues/new)
+
+## License
+
+The BugSnag Flutter Performance SDK is free software released under the MIT License. See the [LICENSE](./LICENSE) for details.
