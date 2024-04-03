@@ -1,6 +1,6 @@
 library bugsnag_flutter_dart_io_http_client;
 
-import 'dart:io';
+import 'dart:io' as dart_io;
 
 final _subscribers = <dynamic Function(dynamic)?>[];
 
@@ -8,9 +8,9 @@ void addSubscriber(dynamic Function(dynamic)? callback) {
   _subscribers.add(callback);
 }
 
-class BugsnagHttpClient implements HttpClient{
+class HttpClient implements dart_io.HttpClient{
 
-  final HttpClient _client = HttpClient();
+  final dart_io.HttpClient _client = dart_io.HttpClient();
   static int _requestId = 0;
   @override
   bool autoUncompress = true;
@@ -27,7 +27,7 @@ class BugsnagHttpClient implements HttpClient{
   @override
   String? userAgent;
 
-  HttpClient _getClient() {
+  dart_io.HttpClient _getClient() {
 
     _client.autoUncompress = autoUncompress;
     _client.connectionTimeout = connectionTimeout;
@@ -58,7 +58,7 @@ class BugsnagHttpClient implements HttpClient{
     return requestId;
   }
 
-  void _sendRequestCompleteNotification(String requestId, HttpClientRequest request, HttpClientResponse response) {
+  void _sendRequestCompleteNotification(String requestId, dart_io.HttpClientRequest request, dart_io.HttpClientResponse response) {
     _notifySubscriber({
       "status": "complete",
       "status_code": response.statusCode,
@@ -77,12 +77,12 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  void addCredentials(Uri url, String realm, HttpClientCredentials credentials) {
+  void addCredentials(Uri url, String realm, dart_io.HttpClientCredentials credentials) {
     _getClient().addCredentials(url, realm, credentials);
   }
 
   @override
-  void addProxyCredentials(String host, int port, String realm, HttpClientCredentials credentials) {
+  void addProxyCredentials(String host, int port, String realm, dart_io.HttpClientCredentials credentials) {
     _getClient().addProxyCredentials(host, port, realm, credentials);
   }
 
@@ -97,7 +97,7 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  set badCertificateCallback(bool Function(X509Certificate cert, String host, int port)? callback) {
+  set badCertificateCallback(bool Function(dart_io.X509Certificate cert, String host, int port)? callback) {
     _client.badCertificateCallback = callback;
   }
 
@@ -107,16 +107,16 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  set connectionFactory(Future<ConnectionTask<Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f) {
+  set connectionFactory(Future<dart_io.ConnectionTask<dart_io.Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f) {
     _client.connectionFactory = f;
   }
 
   @override
-  Future<HttpClientRequest> get(String host, int port, String path) async {
+  Future<dart_io.HttpClientRequest> get(String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "GET");
     return _getClient().get(host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -126,11 +126,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> getUrl(Uri url) async {
+  Future<dart_io.HttpClientRequest> getUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "GET");
     return _getClient().getUrl(url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -140,11 +140,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> delete(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> delete(String host, int port, String path) {
     var requestId = _sendRequestStartNotification("$host:$port$path", "DELETE");
     return _getClient().delete(host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -154,11 +154,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> deleteUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> deleteUrl(Uri url) {
     var requestId = _sendRequestStartNotification(url.toString(), "DELETE");
     return _getClient().deleteUrl(url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -173,11 +173,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> head(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> head(String host, int port, String path) {
     var requestId = _sendRequestStartNotification("$host:$port$path", "HEAD");
     return _getClient().head(host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -187,11 +187,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> headUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> headUrl(Uri url) {
     var requestId = _sendRequestStartNotification(url.toString(), "HEAD");
     return _getClient().headUrl(url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -206,11 +206,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> open(String method, String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> open(String method, String host, int port, String path) {
     var requestId = _sendRequestStartNotification("$host:$port$path", method);
     return _getClient().open(method,host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -220,11 +220,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> openUrl(String method, Uri url) {
+  Future<dart_io.HttpClientRequest> openUrl(String method, Uri url) {
     var requestId = _sendRequestStartNotification(url.toString(), method);
     return _getClient().openUrl(method,url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -234,11 +234,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> patch(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> patch(String host, int port, String path) {
     var requestId = _sendRequestStartNotification("$host:$port$path", "PATCH");
     return _getClient().patch(host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -248,11 +248,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> patchUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> patchUrl(Uri url) {
     var requestId = _sendRequestStartNotification(url.toString(), "PATCH");
     return _getClient().patchUrl(url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -262,11 +262,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> post(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> post(String host, int port, String path) {
     var requestId = _sendRequestStartNotification("$host:$port$path", "POST");
     return _getClient().post(host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -276,11 +276,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> postUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> postUrl(Uri url) {
     var requestId = _sendRequestStartNotification(url.toString(), "POST");
     return _getClient().postUrl(url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -290,11 +290,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> put(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> put(String host, int port, String path) {
     var requestId = _sendRequestStartNotification("$host:$port$path", "PUT");
     return _getClient().put(host,port,path)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
@@ -304,11 +304,11 @@ class BugsnagHttpClient implements HttpClient{
   }
 
   @override
-  Future<HttpClientRequest> putUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> putUrl(Uri url) {
     var requestId = _sendRequestStartNotification(url.toString(), "PUT");
     return _getClient().putUrl(url)
-        .then((HttpClientRequest request) {
-      request.done.then((HttpClientResponse response) {
+        .then((dart_io.HttpClientRequest request) {
+      request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
         _sendRequestFailedNotification(requestId);
