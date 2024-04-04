@@ -1,3 +1,7 @@
-## 0.0.1
+## 1.1.0
 
-* TODO: Describe initial release.
+* Renamed `BugsnagHttpClient` to just `HttpClient` to simplify the implementation process.
+
+## 1.0.0
+
+* initial release.

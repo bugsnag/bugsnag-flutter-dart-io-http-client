@@ -1,6 +1,6 @@
 name: bugsnag_flutter_dart_io_http_client
 description: "BugSnag flutter dart io http client wrapper."
-version: 1.0.0
+version: 1.1.0
 homepage: https://www.bugsnag.com/
 documentation: https://docs.bugsnag.com/performance/flutter/
 repository: https://github.com/bugsnag/bugsnag-flutter-dart-io-http-client
