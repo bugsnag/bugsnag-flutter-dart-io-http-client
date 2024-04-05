@@ -1,6 +1,6 @@
-## 1.1.1
+## 1.2.0
 
-* Fix for some network breadcrumbs not appearing in errors.
+* Added a hard coded client name `dart:io` for more useful network breadcrumb metadata.
 
 ## 1.1.0
 
