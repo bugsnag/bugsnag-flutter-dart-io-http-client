@@ -65,14 +65,17 @@ class HttpClient implements dart_io.HttpClient{
       "request_id": requestId,
       "http_method": request.method,
       "response_content_length": response.contentLength,
-      "request_content_length": request.contentLength
+      "request_content_length": request.contentLength,
+      "client": _client.runtimeType.toString(),
+      "url": request.uri.toString()
     });
   }
 
   void _sendRequestFailedNotification(String requestId) {
     _notifySubscriber({
       "status": "failed",
-      "request_id": requestId
+      "request_id": requestId,
+      "client": _client.runtimeType.toString()
     });
   }
 
