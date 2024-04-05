@@ -66,7 +66,7 @@ class HttpClient implements dart_io.HttpClient{
       "http_method": request.method,
       "response_content_length": response.contentLength,
       "request_content_length": request.contentLength,
-      "client": _client.runtimeType.toString(),
+      "client": 'dart:io',
       "url": request.uri.toString()
     });
   }
