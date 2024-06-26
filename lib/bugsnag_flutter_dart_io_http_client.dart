@@ -169,7 +169,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> delete(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> delete(String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "DELETE");
     return _getClient()
         .delete(host, port, path)
@@ -190,7 +190,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> deleteUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> deleteUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "DELETE");
     return _getClient()
         .deleteUrl(url)
@@ -216,7 +216,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> head(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> head(String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "HEAD");
     return _getClient()
         .head(host, port, path)
@@ -237,7 +237,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> headUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> headUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "HEAD");
     return _getClient().headUrl(url).then((dart_io.HttpClientRequest request) {
       (await _headersProvider
@@ -262,7 +262,7 @@ class HttpClient implements dart_io.HttpClient {
 
   @override
   Future<dart_io.HttpClientRequest> open(
-      String method, String host, int port, String path) {
+      String method, String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", method);
     return _getClient()
         .open(method, host, port, path)
@@ -283,7 +283,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> openUrl(String method, Uri url) {
+  Future<dart_io.HttpClientRequest> openUrl(String method, Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), method);
     return _getClient()
         .openUrl(method, url)
@@ -304,7 +304,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> patch(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> patch(String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "PATCH");
     return _getClient()
         .patch(host, port, path)
@@ -325,7 +325,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> patchUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> patchUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "PATCH");
     return _getClient().patchUrl(url).then((dart_io.HttpClientRequest request) {
       (await _headersProvider
@@ -344,7 +344,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> post(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> post(String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "POST");
     return _getClient()
         .post(host, port, path)
@@ -365,7 +365,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> postUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> postUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "POST");
     return _getClient().postUrl(url).then((dart_io.HttpClientRequest request) {
       (await _headersProvider
@@ -384,7 +384,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> put(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> put(String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "PUT");
     return _getClient()
         .put(host, port, path)
@@ -405,7 +405,7 @@ class HttpClient implements dart_io.HttpClient {
   }
 
   @override
-  Future<dart_io.HttpClientRequest> putUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> putUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "PUT");
     return _getClient().putUrl(url).then((dart_io.HttpClientRequest request) {
       (await _headersProvider
