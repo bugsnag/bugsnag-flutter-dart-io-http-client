@@ -2,15 +2,17 @@ library bugsnag_flutter_dart_io_http_client;
 
 import 'dart:io' as dart_io;
 
+import 'package:bugsnag_bridge/bugsnag_bridge.dart';
+
 final _subscribers = <dynamic Function(dynamic)?>[];
 
 void addSubscriber(dynamic Function(dynamic)? callback) {
   _subscribers.add(callback);
 }
 
-class HttpClient implements dart_io.HttpClient{
-
+class HttpClient implements dart_io.HttpClient {
   final dart_io.HttpClient _client = dart_io.HttpClient();
+  late HttpHeadersProvider _headersProvider = HttpHeadersProviderImpl();
   static int _requestId = 0;
   @override
   bool autoUncompress = true;
@@ -19,7 +21,7 @@ class HttpClient implements dart_io.HttpClient{
   Duration? connectionTimeout;
 
   @override
-  Duration idleTimeout  = const Duration(seconds: 15);
+  Duration idleTimeout = const Duration(seconds: 15);
 
   @override
   int? maxConnectionsPerHost;
@@ -28,7 +30,6 @@ class HttpClient implements dart_io.HttpClient{
   String? userAgent;
 
   dart_io.HttpClient _getClient() {
-
     _client.autoUncompress = autoUncompress;
     _client.connectionTimeout = connectionTimeout;
     _client.idleTimeout = idleTimeout;
@@ -47,7 +48,7 @@ class HttpClient implements dart_io.HttpClient{
     }
   }
 
-  String _sendRequestStartNotification(String? url,String? method) {
+  String _sendRequestStartNotification(String? url, String? method) {
     var requestId = _generateRequestId();
     _notifySubscriber({
       "url": url,
@@ -58,7 +59,8 @@ class HttpClient implements dart_io.HttpClient{
     return requestId;
   }
 
-  void _sendRequestCompleteNotification(String requestId, dart_io.HttpClientRequest request, dart_io.HttpClientResponse response) {
+  void _sendRequestCompleteNotification(String requestId,
+      dart_io.HttpClientRequest request, dart_io.HttpClientResponse response) {
     _notifySubscriber({
       "status": "complete",
       "status_code": response.statusCode,
@@ -80,27 +82,35 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  void addCredentials(Uri url, String realm, dart_io.HttpClientCredentials credentials) {
+  void addCredentials(
+      Uri url, String realm, dart_io.HttpClientCredentials credentials) {
     _getClient().addCredentials(url, realm, credentials);
   }
 
   @override
-  void addProxyCredentials(String host, int port, String realm, dart_io.HttpClientCredentials credentials) {
+  void addProxyCredentials(String host, int port, String realm,
+      dart_io.HttpClientCredentials credentials) {
     _getClient().addProxyCredentials(host, port, realm, credentials);
   }
 
   @override
-  set authenticate(Future<bool> Function(Uri url, String scheme, String? realm)? f) {
+  set authenticate(
+      Future<bool> Function(Uri url, String scheme, String? realm)? f) {
     _client.authenticate = f;
   }
 
   @override
-  set authenticateProxy(Future<bool> Function(String host, int port, String scheme, String? realm)? f) {
+  set authenticateProxy(
+      Future<bool> Function(
+              String host, int port, String scheme, String? realm)?
+          f) {
     _client.authenticateProxy = f;
   }
 
   @override
-  set badCertificateCallback(bool Function(dart_io.X509Certificate cert, String host, int port)? callback) {
+  set badCertificateCallback(
+      bool Function(dart_io.X509Certificate cert, String host, int port)?
+          callback) {
     _client.badCertificateCallback = callback;
   }
 
@@ -110,15 +120,25 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  set connectionFactory(Future<dart_io.ConnectionTask<dart_io.Socket>> Function(Uri url, String? proxyHost, int? proxyPort)? f) {
+  set connectionFactory(
+      Future<dart_io.ConnectionTask<dart_io.Socket>> Function(
+              Uri url, String? proxyHost, int? proxyPort)?
+          f) {
     _client.connectionFactory = f;
   }
 
   @override
-  Future<dart_io.HttpClientRequest> get(String host, int port, String path) async {
+  Future<dart_io.HttpClientRequest> get(
+      String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "GET");
-    return _getClient().get(host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .get(host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -131,8 +151,14 @@ class HttpClient implements dart_io.HttpClient{
   @override
   Future<dart_io.HttpClientRequest> getUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "GET");
-    return _getClient().getUrl(url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .getUrl(url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -143,10 +169,17 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> delete(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> delete(
+      String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "DELETE");
-    return _getClient().delete(host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .delete(host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -157,10 +190,16 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> deleteUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> deleteUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "DELETE");
-    return _getClient().deleteUrl(url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .deleteUrl(url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -176,10 +215,17 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> head(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> head(
+      String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "HEAD");
-    return _getClient().head(host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .head(host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -190,10 +236,16 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> headUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> headUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "HEAD");
-    return _getClient().headUrl(url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .headUrl(url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -209,10 +261,17 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> open(String method, String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> open(
+      String method, String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", method);
-    return _getClient().open(method,host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .open(method, host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -223,10 +282,16 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> openUrl(String method, Uri url) {
+  Future<dart_io.HttpClientRequest> openUrl(String method, Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), method);
-    return _getClient().openUrl(method,url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .openUrl(method, url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -237,10 +302,17 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> patch(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> patch(
+      String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "PATCH");
-    return _getClient().patch(host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .patch(host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -251,10 +323,16 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> patchUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> patchUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "PATCH");
-    return _getClient().patchUrl(url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .patchUrl(url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -265,10 +343,17 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> post(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> post(
+      String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "POST");
-    return _getClient().post(host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .post(host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -279,10 +364,16 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> postUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> postUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "POST");
-    return _getClient().postUrl(url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .postUrl(url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -293,10 +384,17 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> put(String host, int port, String path) {
+  Future<dart_io.HttpClientRequest> put(
+      String host, int port, String path) async {
     var requestId = _sendRequestStartNotification("$host:$port$path", "PUT");
-    return _getClient().put(host,port,path)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .put(host, port, path)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -307,10 +405,16 @@ class HttpClient implements dart_io.HttpClient{
   }
 
   @override
-  Future<dart_io.HttpClientRequest> putUrl(Uri url) {
+  Future<dart_io.HttpClientRequest> putUrl(Uri url) async {
     var requestId = _sendRequestStartNotification(url.toString(), "PUT");
-    return _getClient().putUrl(url)
-        .then((dart_io.HttpClientRequest request) {
+    return _getClient()
+        .putUrl(url)
+        .then((dart_io.HttpClientRequest request) async {
+      (await _headersProvider.requestHeaders(
+        url: request.uri.toString(),
+        requestId: requestId,
+      ))
+          ?.forEach((key, value) => request.headers.set(key, value));
       request.done.then((dart_io.HttpClientResponse response) {
         _sendRequestCompleteNotification(requestId, request, response);
       }).catchError((error) {
@@ -319,7 +423,4 @@ class HttpClient implements dart_io.HttpClient{
       return request;
     });
   }
-
-
-
 }
